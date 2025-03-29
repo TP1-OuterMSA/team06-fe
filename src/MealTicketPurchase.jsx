@@ -22,8 +22,8 @@ function MealTicketPurchase() {
         </>
       ) : (
         <>
-                <img className="soldOutImage" src="/soldout.png" alt="Sold Out" />
-                <p className="soldOutText">식권이 모두 판매되었습니다</p>
+          <img className="soldOutImage" src="/soldout.png" alt="Sold Out" />
+          <p className="soldOutText">식권이 모두 판매되었습니다!</p>
         </>
       )}
     </div>
