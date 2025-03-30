@@ -1,22 +1,41 @@
 import React, { useState } from "react";
 import "./MealTicketPurchase.css"; 
+import { useEffect } from "react";
+import Axios from "axios";
 
 function MealTicketPurchase() {
-  const [remainingTickets, setRemainingTickets] = useState(12);
-  const totalTickets = 100;
+  const [remainingTickets, setRemainingTickets] = useState(null);
 
-  const handleBuyTicket = () => {
-    if (remainingTickets > 0) {
-      setRemainingTickets(remainingTickets - 1);
+  useEffect(() => {
+    getRemainingTickets();
+  }, []);
+
+  const getRemainingTickets = async () => {
+    try {
+      const response = await Axios.get("http://localhost:8080/api/ticket");
+      const data = response.data;
+      setRemainingTickets(data);
+    } catch (error) {
+      console.error("Error fetching tickets:", error);
     }
-  };
+  }
+
+  const handleTicketPurchase = async () => {
+    try {
+      const response = await Axios.post(`http://localhost:8080/api/ticket/${remainingTickets.id}/purchase`);
+      const data = response.data;
+      setRemainingTickets(data.ticket);
+    } catch (error) {
+      console.error("Error purchasing ticket:", error);
+    }
+  }
 
   return (
     <div className="container">
-      {remainingTickets > 0 ? (
+      {remainingTickets && !remainingTickets.soldOut ? (
         <>
-          <h1 className="title">{`${remainingTickets} / ${totalTickets}`}</h1>
-          <button className="buyButton" onClick={handleBuyTicket}>
+          <h1 className="title">{`${remainingTickets.count} / ${remainingTickets.totalCount}`}</h1>
+          <button className="buyButton" onClick={() => handleTicketPurchase()}>
             식권 구매
           </button>
         </>
