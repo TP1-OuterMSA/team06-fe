@@ -2,14 +2,17 @@
 .container {
     text-align: center;
   }
+  .menu-title {
+    font-size:  4rem;
+  }
   
   .title {
-    font-size: 9rem;
+    font-size: 5rem;
   }
   
   .buyButton {
-    font-size: 3rem;
-    padding: 2rem 4rem;
+    font-size: 2rem;
+    padding: 1rem 3rem;
     background-color: #007bff;
     color: #fff;
     border: none;
@@ -20,6 +23,7 @@
   .soldOutImage {
     width: 400px; 
   }
+
   .soldOutText {
     font-size: 3rem;
     margin-top: 20px;

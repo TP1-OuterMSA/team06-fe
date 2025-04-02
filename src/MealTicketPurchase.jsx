@@ -34,7 +34,8 @@ function MealTicketPurchase() {
     <div className="container">
       {remainingTickets && !remainingTickets.soldOut ? (
         <>
-          <h1 className="title">{`${remainingTickets.count} / ${remainingTickets.totalCount}`}</h1>
+          <h1 className="menu-title">{remainingTickets.menu}</h1>
+          <h2 className="title">{`${remainingTickets.count} / ${remainingTickets.totalCount}`}</h2>
           <button className="buyButton" onClick={() => handleTicketPurchase()}>
             식권 구매
           </button>
