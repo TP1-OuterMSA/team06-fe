@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "./MealTicketPurchase.css"; 
 import { useEffect } from "react";
 import Axios from "axios";
+import "../styles/MealTicketPurchase.css";
 
 function MealTicketPurchase() {
   const [remainingTickets, setRemainingTickets] = useState(null);
