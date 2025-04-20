@@ -1,7 +1,13 @@
 name: Frontend Development Deploy
+
 on:
+  pull_request:
+    types: [closed]
+    branches:
+      - 'develop'
   push:
-    branches: [ release ]
+    branches:
+      - 'release'
 
 env:
   APP_ENV: development
