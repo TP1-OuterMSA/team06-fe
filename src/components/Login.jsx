@@ -12,7 +12,7 @@ function Login() {
     const password = e.target.password.value;
   
     try {
-      const response = await axios.post("http://localhost:8080/api/team6/user/login", {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/team6/user/login`, {
         username,
         password,
       });
