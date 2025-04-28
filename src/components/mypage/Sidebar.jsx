@@ -5,7 +5,7 @@ import { UserContext } from "../../context/UserContext";
 
 const menuItems = [
   { icon: "📢", label: "알레르기 정보", to: "/mypage/allergies" },
-  { icon: "😎", label: "프로필",       to: "/mypage" },
+  // { icon: "😎", label: "프로필",       to: "/mypage" },
   { icon: "🔔", label: "알림 설정",     to: "/mypage/notifications" },
   { icon: "♥️", label: "즐겨찾기",       to: "/mypage/favorites" },
   { icon: "⚙️", label: "계정 관리",     to: "/mypage/account" },

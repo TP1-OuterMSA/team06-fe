@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { UserContext } from "../../context/UserContext";
+import axios from "axios";
 
 function AccountManagementPage() {
   const navigate = useNavigate();
@@ -10,10 +11,25 @@ function AccountManagementPage() {
   const [email, setEmail] = useState(user.email);
 
   const handleSave = () => {
-    setUser({ ...user, username, email });
+    // setUser({ ...user, username, email });
+    saveUserInfo();
     alert("계정 정보가 업데이트되었습니다.");
-    navigate("/mypage");
+    // navigate("/mypage");
   };
+
+  const saveUserInfo = async () => {
+    try {
+      const response = await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/api/team6/user/update/${user.id}`, {
+        username: username,
+        email: email
+      });
+      const data = response.data;
+      setUser(data);
+      console.log(data);
+    } catch (error) {
+      console.error('Error updating user info:', error);
+    }
+  }
 
   return (
     <div className="flex min-h-screen bg-[#f5f7fa] text-gray-800">

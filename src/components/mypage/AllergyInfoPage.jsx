@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import axios from "axios";
+import { useContext } from "react";
+import { UserContext } from '../../context/UserContext';
 
 // 기본 알레르기 옵션
 const defaultAllergies = [
@@ -14,31 +17,87 @@ function AllergyInfoPage() {
   const [allergyOptions, setAllergyOptions] = useState([]);
   const [selectedAllergies, setSelectedAllergies] = useState([]);
   const [newAllergy, setNewAllergy] = useState("");
+  const [allergies, setAllergies] = useState(defaultAllergies);
+  const { user } = useContext(UserContext);
+
+  const getAllAllergies = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/team6/allergy/all`);
+      const data = response.data;
+      setAllergies(data);
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+    }
+  }
 
   useEffect(() => {
-    const stored = localStorage.getItem("allergyOptions");
-    if (stored) {
-      setAllergyOptions(JSON.parse(stored));
-    } else {
-      setAllergyOptions(defaultAllergies);
-      localStorage.setItem("allergyOptions", JSON.stringify(defaultAllergies));
-    }
-
-    // 초기 선택 항목 예시
-    const initial = ["땅콩", "우유"];
-    setSelectedAllergies(initial);
+    getAllAllergies();
+    getMyAllergies();
   }, []);
+
+  const getMyAllergies = async () => {
+    try{
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/team6/userAllergy/${user.id}`);
+      const data = response.data;
+      setSelectedAllergies(data.allergies);
+    }catch (error) {
+      console.error('Error fetching user info:', error);
+    }
+  }
+
+  const updateAllergyOptions = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/team6/userAllergy/update`, 
+        {
+          userId: user.id,
+          allergies: selectedAllergies
+        }
+      );
+      const data = response.data;
+      setAllergies(data);
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+    }
+  }
+
+
+  // useEffect(() => {
+  //   const stored = localStorage.getItem("allergyOptions");
+  //   if (stored) {
+  //     setAllergyOptions(JSON.parse(stored));
+  //   } else {
+  //     setAllergyOptions(defaultAllergies);
+  //     localStorage.setItem("allergyOptions", JSON.stringify(defaultAllergies));
+  //   }
+
+  //   // 초기 선택 항목 예시
+  //   const initial = ["땅콩", "우유"];
+  //   setSelectedAllergies(initial);
+  // }, []);
 
   const handleToggle = (opt) => {
     setSelectedAllergies(prev =>
-      prev.includes(opt)
-        ? prev.filter(a => a !== opt)
+      prev.some(a => a.id === opt.id)
+        ? prev.filter(a => a.id !== opt.id)
         : [...prev, opt]
     );
   };
 
+  const saveAllergies = async () => {
+    try {
+      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/team6/userAllergy/update`, {
+        userId: user.id,
+        allergies: selectedAllergies.map(a => a.id)
+      });
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+    }
+  };
+
   const handleSave = () => {
-    alert(`알레르기가 저장되었습니다: ${selectedAllergies.join(", ")}`);
+    saveAllergies();
+    const allergyNames = selectedAllergies.map(a => a.name).join(", ");
+    alert(`알레르기가 저장되었습니다: ${allergyNames}`);
   };
 
   const handleAddAllergy = () => {
@@ -64,7 +123,7 @@ function AllergyInfoPage() {
         {/* 등록 카드 */}
         <div className="bg-white p-6 rounded-xl shadow mb-6">
           <div className="text-lg font-semibold">
-            등록된 알레르기: {selectedAllergies.length ? selectedAllergies.join(', ') : '없음'}
+          등록된 알레르기: {selectedAllergies.length ? selectedAllergies.map(a => a.name).join(', ') : '없음'}
           </div>
         </div>
 
@@ -72,15 +131,16 @@ function AllergyInfoPage() {
         <div className="bg-white p-6 rounded-xl shadow mb-6">
           <div className="text-lg font-semibold mb-4">알레르기 수정</div>
           <div className="grid grid-cols-3 gap-4">
-            {allergyOptions.map(opt => (
-              <label key={opt} className="flex items-center space-x-2">
+            {allergies.length > 0 && allergies.map((allergy, index) => (
+              <label key={index} className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
-                  checked={selectedAllergies.includes(opt)}
-                  onChange={() => handleToggle(opt)}
+                  // checked={selectedAllergies.includes(allergy)}
+                  checked={selectedAllergies.some(selected => selected.id === allergy.id)}
+                  onChange={() => handleToggle(allergy)}
                 />
-                <span className="text-sm">{opt}</span>
+                <span className="text-sm">{allergy.name}</span>
               </label>
             ))}
           </div>
@@ -93,7 +153,7 @@ function AllergyInfoPage() {
         </div>
 
         {/* 새 옵션 추가 */}
-        <div className="bg-white p-6 rounded-xl shadow">
+        {/* <div className="bg-white p-6 rounded-xl shadow">
           <div className="text-lg font-semibold mb-4">새 알레르기 추가</div>
           <div className="flex items-center space-x-2">
             <input
@@ -110,7 +170,7 @@ function AllergyInfoPage() {
               추가
             </button>
           </div>
-        </div>
+        </div> */}
       </main>
     </div>
   );
