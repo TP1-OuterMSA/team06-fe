@@ -18,7 +18,7 @@ function Sidebar() {
     <aside className="w-[280px] bg-white p-5 border-r border-gray-200">
       <div className="text-center border-b border-gray-200 py-6">
         <div className="text-lg font-bold">
-          {user ? user.username : "게스트"}
+          {user ? user.nickname : "게스트"}
         </div>
         <div className="text-sm text-gray-500 mt-1">
           {user ? user.email : "로그인 해주세요"}

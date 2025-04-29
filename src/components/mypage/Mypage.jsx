@@ -38,7 +38,7 @@ function Mypage() {
           {myInfo && (
             <>
               {/* 서버에서 받아온 사용자 정보로 Header에 전달 */}
-              <Header username={myInfo.username} email={myInfo.email} />
+              <Header nickname={myInfo.nickname} email={myInfo.email} />
               {/* 각 섹션에도 user.id를 prop으로 넘겨 데이터를 불러오도록 함 */}
               <AllergyInfoCard allergies={myInfo.allergies} />
               <NotificationSettings userId={user.id} />

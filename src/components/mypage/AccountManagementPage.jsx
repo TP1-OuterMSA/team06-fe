@@ -7,7 +7,7 @@ import axios from "axios";
 function AccountManagementPage() {
   const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext);
-  const [username, setUsername] = useState(user.username);
+  const [nickname, setNickname] = useState(user.nickname);
   const [email, setEmail] = useState(user.email);
 
   const handleSave = () => {
@@ -20,7 +20,7 @@ function AccountManagementPage() {
   const saveUserInfo = async () => {
     try {
       const response = await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/api/team6/user/update/${user.id}`, {
-        username: username,
+        nickname: nickname,
         email: email
       });
       const data = response.data;
@@ -38,32 +38,44 @@ function AccountManagementPage() {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold">계정 관리</h2>
         </div>
-
         <div className="bg-white p-6 rounded-xl shadow">
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">사용자명</label>
-            <input
-              type="text"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-            />
-          </div>
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-1">이메일</label>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-            />
-          </div>
-          <button
-            onClick={handleSave}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg"
-          >
-            저장
-          </button>
+          <form onSubmit={handleSave} className="w-full p-4">
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">아이디</label>
+              <div className="w-full p-3 text-xl">
+                {user.username}
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">닉네임</label>
+              <input
+                type="text"
+                value={nickname}
+                required
+                onChange={e => setNickname(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium mb-1">이메일</label>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg"
+            >
+              저장
+            </button>
+          </form>
         </div>
       </main>
     </div>

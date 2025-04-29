@@ -45,22 +45,6 @@ function AllergyInfoPage() {
     }
   }
 
-  const updateAllergyOptions = async () => {
-    try {
-      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/team6/userAllergy/update`, 
-        {
-          userId: user.id,
-          allergies: selectedAllergies
-        }
-      );
-      const data = response.data;
-      setAllergies(data);
-    } catch (error) {
-      console.error('Error fetching user info:', error);
-    }
-  }
-
-
   // useEffect(() => {
   //   const stored = localStorage.getItem("allergyOptions");
   //   if (stored) {
