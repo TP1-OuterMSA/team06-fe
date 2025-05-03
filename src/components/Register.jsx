@@ -72,6 +72,7 @@ function Register() {
       username: formData.id,
       email: formData.email,
       password: formData.password,
+      nickname: formData.nickname,
       allergies: allergyIds
     };
 
