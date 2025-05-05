@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { UserContext } from "../../context/UserContext";
@@ -9,7 +9,13 @@ function AccountManagementPage() {
   const { user, setUser } = useContext(UserContext);
   const [nickname, setNickname] = useState(user.nickname);
   const [email, setEmail] = useState(user.email);
+  const [profileImage, setProfileImage] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
+  useEffect(() => {
+    setPreviewUrl(user.profileImageUrl); // 서버에서 불러온 기본 이미지
+  }, []);
+  
   const handleSave = () => {
     // setUser({ ...user, username, email });
     saveUserInfo();
@@ -31,6 +37,18 @@ function AccountManagementPage() {
     }
   }
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfileImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-[#f5f7fa] text-gray-800">
       <Sidebar />
@@ -40,6 +58,25 @@ function AccountManagementPage() {
         </div>
         <div className="bg-white p-6 rounded-xl shadow">
           <form onSubmit={handleSave} className="w-full p-4">
+            <div className="mb-6">
+              <label className="block text-sm font-medium mb-1">프로필 사진</label>
+              <label className="relative inline-block w-40 h-40 p-3 group cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+                <img
+                  src={previewUrl || "/default-profile.png"}
+                  alt="프로필 사진"
+                  className="w-40 h-40 object-cover border border-gray-300 transition duration-300 group-hover:brightness-75"
+                />
+                <div className="absolute inset-0 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition duration-300">
+                  <span className="text-white text-sm font-semibold">클릭하여 변경</span>
+                </div>
+              </label>
+            </div>
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1">아이디</label>
               <div className="w-full p-3 text-xl">
@@ -68,7 +105,6 @@ function AccountManagementPage() {
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
               />
             </div>
-
             <button
               type="submit"
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg"
