@@ -17,13 +17,20 @@ function Sidebar() {
   return (
     <aside className="w-[280px] bg-white p-5 border-r border-gray-200">
       <div className="text-center border-b border-gray-200 py-6">
-        <div className="text-lg font-bold">
-          {user ? user.nickname : "게스트"}
-        </div>
-        <div className="text-sm text-gray-500 mt-1">
-          {user ? user.email : "로그인 해주세요"}
-        </div>
+      <div className="flex justify-center mb-4">
+        <img
+          src={user.profileImage}
+          alt="프로필 이미지"
+          className="w-32 h-32 rounded-full object-cover border border-gray-300"
+        />
       </div>
+      <div className="text-lg font-bold">
+        {user ? user.nickname : "게스트"}
+      </div>
+      <div className="text-sm text-gray-500 mt-1">
+        {user ? user.email : "로그인 해주세요"}
+      </div>
+    </div>
 
       <nav className="mt-6 space-y-2">
         {menuItems.map(({ icon, label, to }) => (
