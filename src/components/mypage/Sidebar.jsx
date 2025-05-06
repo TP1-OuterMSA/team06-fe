@@ -13,15 +13,17 @@ const menuItems = [
 
 function Sidebar() {
   const { user } = useContext(UserContext);
-
+    const imgSrc = user.profileImageUrl
+     ? `${import.meta.env.VITE_API_BASE_URL}${user.profileImageUrl}`
+      : "/default-profile.jpg";
   return (
     <aside className="w-[280px] bg-white p-5 border-r border-gray-200">
       <div className="text-center border-b border-gray-200 py-6">
       <div className="flex justify-center mb-4">
-        <img
-          src={user.profileImage}
+      <img
+          src={imgSrc}
           alt="프로필 이미지"
-          className="w-32 h-32 rounded-full object-cover border border-gray-300"
+          className="w-32 h-32 rounded-full object-cover border border-gray-300 mx-auto mb-4"
         />
       </div>
       <div className="text-lg font-bold">
