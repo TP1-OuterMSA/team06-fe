@@ -11,7 +11,7 @@ function AccountManagementPage() {
   const [previewUrl, setPreviewUrl] = useState(
     user.profileImageUrl
       ? `${import.meta.env.VITE_API_BASE_URL}${user.profileImageUrl}`
-      : "/default-profile.jpg"
+      : "/profile.png"
   );
 
   // user.profileImageUrl이 바뀔 때마다 previewUrl도 갱신
@@ -19,7 +19,7 @@ function AccountManagementPage() {
     setPreviewUrl(
       user.profileImageUrl
         ? `${import.meta.env.VITE_API_BASE_URL}${user.profileImageUrl}`
-        : "/default-profile.jpg"
+        : "/profile.png"
     );
   }, [user.profileImageUrl]);
 
