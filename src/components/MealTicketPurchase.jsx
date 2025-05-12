@@ -12,7 +12,7 @@ function MealTicketPurchase() {
 
   const getRemainingTickets = async () => {
     try {
-      const response = await Axios.get("http://localhost:8080/api/team6/ticket");
+      const response = await Axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/team6/ticket`);
       const data = response.data;
       setRemainingTickets(data);
     } catch (error) {
@@ -22,7 +22,7 @@ function MealTicketPurchase() {
 
   const handleTicketPurchase = async () => {
     try {
-      const response = await Axios.post(`http://localhost:8080/api/team6/ticket/${remainingTickets.id}/purchase`);
+      const response = await Axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/team6/ticket/${remainingTickets.id}/purchase`);
       const data = response.data;
       setRemainingTickets(data.ticket);
     } catch (error) {

@@ -77,7 +77,7 @@ function Register() {
     };
 
     try {
-      const res = await axios.post("http://localhost:8080/api/team6/user/signup", requestData);
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/team6/user/signup`, requestData);
       console.log("회원가입 성공:", res.data);
       setIsModalOpen(true);
     } catch (err) {
