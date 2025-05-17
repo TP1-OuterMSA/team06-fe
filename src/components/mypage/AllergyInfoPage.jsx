@@ -137,7 +137,7 @@ function AllergyInfoPage() {
         </div>
 
         {/* 새 옵션 추가 */}
-        {/* <div className="bg-white p-6 rounded-xl shadow">
+        { <div className="bg-white p-6 rounded-xl shadow">
           <div className="text-lg font-semibold mb-4">새 알레르기 추가</div>
           <div className="flex items-center space-x-2">
             <input
@@ -154,7 +154,7 @@ function AllergyInfoPage() {
               추가
             </button>
           </div>
-        </div> */}
+        </div> }
       </main>
     </div>
   );

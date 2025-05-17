@@ -9,6 +9,8 @@ function AccountManagementPage() {
   const [nickname, setNickname] = useState(user.nickname);
   const [email, setEmail] = useState(user.email);
   const [profileImageFile, setProfileImageFile] = useState(null);
+  const [promotionStatus, setPromotionStatus] = useState(null);
+  const [loadingRequest, setLoadingRequest] = useState(false);
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
   const handleImageChange = (e) => {
@@ -24,18 +26,14 @@ function AccountManagementPage() {
       const token = localStorage.getItem("jwtToken");
       axios.defaults.headers.common.Authorization = `Bearer ${token}`;
 
-      // 1) 닉네임·이메일 업데이트
       const { data: updatedUser } = await axios.patch(
         `${API_BASE}/api/team6/user/update`,
         { nickname, email }
       );
 
-      let newUser = updatedUser;
-
-      // 2) 프로필 이미지 업로드
       if (profileImageFile) {
         const form = new FormData();
-        form.append('file', profileImageFile);
+        form.append("file", profileImageFile);
 
         await axios.post(
           `${API_BASE}/api/team6/user/profile-image`,
@@ -44,17 +42,51 @@ function AccountManagementPage() {
         );
       }
 
-      // 3) Context 업데이트
       setUser({
-        ...newUser,
+        ...updatedUser,
         nickname,
         email
       });
 
-      alert('계정 정보가 업데이트되었습니다.');
+      alert("계정 정보가 업데이트되었습니다.");
     } catch (err) {
       console.error(err);
-      alert('오류가 발생했습니다.');
+      alert("오류가 발생했습니다.");
+    }
+  };
+
+  // 승격 상태 조회
+  useEffect(() => {
+    const fetchPromotionStatus = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+        const res = await axios.get(`${API_BASE}/api/team6/user/promotion/status`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setPromotionStatus(res.data.status); // "NONE", "PENDING", "REJECTED"
+      } catch (err) {
+        console.error("승격 상태 조회 실패:", err);
+      }
+    };
+
+    if (user?.role === "USER") {
+      fetchPromotionStatus();
+    }
+  }, [user]);
+
+  const handlePromotionRequest = async () => {
+    try {
+      setLoadingRequest(true);
+      await axios.post(`${API_BASE}/api/team6/user/promotion/request`, null, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
+      });
+      alert("승격 요청이 전송되었습니다.");
+      setPromotionStatus("PENDING");
+    } catch (err) {
+      console.error("승격 요청 실패:", err);
+      alert("요청에 실패했습니다.");
+    } finally {
+      setLoadingRequest(false);
     }
   };
 
@@ -72,7 +104,7 @@ function AccountManagementPage() {
               </label>
               <ProfileImage
                 apiBaseUrl={API_BASE}
-                token={localStorage.getItem('jwtToken')}
+                token={localStorage.getItem("jwtToken")}
                 className="w-40 h-40 rounded-full object-cover"
               />
               <input
@@ -122,6 +154,33 @@ function AccountManagementPage() {
               저장
             </button>
           </form>
+
+          {/* 관리자 승격 요청 버튼 (작게, 조건부 노출) */}
+          {user?.role === "USER" && (
+            <div className="mt-4 text-right">
+              {promotionStatus === "NONE" && (
+                <button
+                  onClick={handlePromotionRequest}
+                  disabled={loadingRequest}
+                  className="text-sm text-indigo-600 hover:underline"
+                >
+                  {loadingRequest ? "요청 중..." : "관리자 승격 요청하기"}
+                </button>
+              )}
+
+              {promotionStatus === "PENDING" && (
+                <p className="text-sm text-gray-500">
+                  관리자 승격 요청이 접수되었습니다.
+                </p>
+              )}
+
+              {promotionStatus === "REJECTED" && (
+                <p className="text-sm text-red-500">
+                  이전 요청이 거절되었습니다.
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </main>
     </div>
