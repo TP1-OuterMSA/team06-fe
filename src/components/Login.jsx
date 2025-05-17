@@ -23,7 +23,7 @@ function Login() {
       setUser(userDto);
       localStorage.setItem('jwtToken', userDto.jwtToken);
       axios.defaults.headers.common['Authorization'] = `Bearer ${userDto.jwtToken}`;
-      
+      console.log("로그인 응답 userDto:", userDto);
       // 마이페이지 메인으로 이동
       navigate('/mypage');
     } catch (error) {

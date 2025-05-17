@@ -7,8 +7,11 @@ import Mypage from "./components/mypage/Mypage"
 import AllergyInfoPage from "./components/mypage/AllergyInfoPage";
 import AccountManagementPage from "./components/mypage/AccountManagementPage";
 
-import { BrowserRouter, Routes, Route, Link} from "react-router-dom";
+import RequireAdmin from "./components/mypage/RequireAdmin";
+import AdminDashboard from "./components/mypage/AdminDashboard";
 
+import { BrowserRouter, Routes, Route, Link} from "react-router-dom";
+import { UserProvider } from "./context/UserContext";
 
 function App() { 
     return ( 
@@ -21,6 +24,16 @@ function App() {
                 <Route path="/mypage" element={<Mypage />} />
                 <Route path="/mypage/allergies" element={<AllergyInfoPage />} />
                 <Route path="/mypage/account" element={<AccountManagementPage />} />
+            
+                      <Route
+            path="/admin/*"
+            element={
+              <RequireAdmin>
+                <AdminDashboard />
+              </RequireAdmin>
+            }
+          />
+            
             </Routes>
         </BrowserRouter>
     ); 
