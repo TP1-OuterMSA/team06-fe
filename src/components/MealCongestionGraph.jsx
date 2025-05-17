@@ -15,7 +15,7 @@ function MealCongestionGraph() {
 
   const fetchData = async (meal) => {
     try {
-      const response = await Axios.get(`http://localhost:8080/api/team6/congestion/${meal}`);
+      const response = await Axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/team6/congestion/${meal}`);
       setChartData(response.data);
     } catch (error) {
       console.error("혼잡도 데이터 요청 실패:", error);

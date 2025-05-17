@@ -1,5 +1,7 @@
 import React from "react";
 import FavoriteItem from "./FavoriteItem";
+import cheeseburger from "../../../public/cheesebuger.png"
+import pizza from "../../../public/peper.jpg"
 
 function FavoritesSection() {
   const favorites = [
@@ -8,14 +10,14 @@ function FavoritesSection() {
       price: "8,500원",
       status: "판매중",
       statusType: "available",
-      image: "/cheesebuger.png",
+      image: cheeseburger,
     },
     {
       name: "페퍼로니 피자",
       price: "18,000원",
       status: "품절",
       statusType: "soldout",
-      image: "/peper.jpg",
+      image: pizza,
     },
   ];
 

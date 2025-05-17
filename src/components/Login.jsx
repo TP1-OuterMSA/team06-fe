@@ -21,7 +21,9 @@ function Login() {
 
       // Context와 localStorage에 사용자 정보 저장
       setUser(userDto);
-
+      localStorage.setItem('jwtToken', userDto.jwtToken);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${userDto.jwtToken}`;
+      
       // 마이페이지 메인으로 이동
       navigate('/mypage');
     } catch (error) {
