@@ -155,31 +155,30 @@ function AccountManagementPage() {
             </button>
           </form>
 
-          {/* 관리자 승격 요청 버튼 (작게, 조건부 노출) */}
-          {user?.role === "USER" && (
-            <div className="mt-4 text-right">
-              {promotionStatus === "NONE" && (
-                <button
-                  onClick={handlePromotionRequest}
-                  disabled={loadingRequest}
-                  className="text-sm text-indigo-600 hover:underline"
-                >
-                  {loadingRequest ? "요청 중..." : "관리자 승격 요청하기"}
-                </button>
-              )}
+{user?.role === "USER" && (
+  <div className="mt-6 p-4 border border-indigo-600 rounded-lg bg-indigo-50 text-right">
+    {promotionStatus === "NONE" && (
+      <button
+        onClick={handlePromotionRequest}
+        disabled={loadingRequest}
+        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm"
+      >
+        {loadingRequest ? "요청 중..." : "관리자 승격 요청하기"}
+      </button>
+    )}
 
-              {promotionStatus === "PENDING" && (
-                <p className="text-sm text-gray-500">
-                  관리자 승격 요청이 접수되었습니다.
-                </p>
-              )}
+    {promotionStatus === "PENDING" && (
+      <p className="text-sm text-indigo-700">
+        관리자 승격 요청이 <strong>접수</strong>되었습니다.
+      </p>
+    )}
 
-              {promotionStatus === "REJECTED" && (
-                <p className="text-sm text-red-500">
-                  이전 요청이 거절되었습니다.
-                </p>
-              )}
-            </div>
+    {promotionStatus === "REJECTED" && (
+      <p className="text-sm text-red-600">
+        이전 요청이 <strong>거절</strong>되었습니다.
+      </p>
+    )}
+  </div>
           )}
         </div>
       </main>
