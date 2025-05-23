@@ -1,30 +1,43 @@
 import React, { createContext, useState, useEffect } from "react";
+import axios from "axios";
 
-export const UserContext = createContext({
-  user: null,
-  setUser: () => {},
-  loading: true,
-});
+export const UserContext = createContext();
 
 export function UserProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    // 새로 고침해도 localStorage에 저장된 유저 정보를 불러옴
-    const stored = localStorage.getItem("user");
-    return stored ? JSON.parse(stored) : null;
-  });
-  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
 
-  // user 상태가 변하면 localStorage에 저장
+  // 앱 초기화 시: localStorage 에 토큰이 남아 있으면 axios 헤더에 설정하고
+  // /me 로 유저 정보 가져와서 Context 채우기
   useEffect(() => {
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
-    } else {
-      localStorage.removeItem("user");
+    const token = localStorage.getItem("jwtToken");
+    if (token) {
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+      axios
+        .get(`${import.meta.env.VITE_API_BASE_URL}/api/team6/user/me`)
+        .then((res) => setUser(res.data))
+        .catch(() => {
+          // 토큰이 만료됐거나 유효하지 않으면 초기화
+          localStorage.removeItem("jwtToken");
+          delete axios.defaults.headers.common.Authorization;
+        });
     }
-  }, [user]);
+  }, []);
+
+  const login = (userDto) => {
+    // 로그인 성공 시 호출하는 유틸
+    setUser(userDto);
+    localStorage.setItem("jwtToken", userDto.jwtToken);
+    axios.defaults.headers.common.Authorization = `Bearer ${userDto.jwtToken}`;
+  };
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("jwtToken");
+    delete axios.defaults.headers.common.Authorization;
+  };
 
   return (
-    <UserContext.Provider value={{ user, setUser, loading }}>
+    <UserContext.Provider value={{ user, setUser, login, logout }}>
       {children}
     </UserContext.Provider>
   );
