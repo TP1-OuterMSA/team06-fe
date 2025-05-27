@@ -13,26 +13,22 @@ export default function Login() {
     const password = e.target.password.value;
 
     try {
-      const response = await axios.post(
+      const { data } = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/auth/user/login`,
         { username, password }
       );
 
-      console.log(response)
-      let userDto = response.data;
+      // { accessToken, refreshToken } 형태라고 가정
+      login(data);
 
-      // UserContext 에 저장 및 axios 헤더 자동 설정
-      login(userDto);
-      console.log(userDto)
-
-      // 메인(마이페이지)으로 이동
+      // 마이페이지로 이동
       navigate("/mypage");
     } catch (error) {
       console.error("로그인 실패:", error);
       alert("로그인 정보가 잘못되었습니다.");
     }
   };
-
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f5f7fa]">
       <form
