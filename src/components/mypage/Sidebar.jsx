@@ -15,7 +15,7 @@ const menuItems = [
 
 function Sidebar() {
   const { user } = useContext(UserContext);
-  const token = localStorage.getItem("jwtToken");
+  const token = localStorage.getItem("accessToken");
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 console.log("Sidebar user context:", user);

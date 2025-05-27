@@ -23,7 +23,7 @@ export default function AdminDashboard() {
   const [rejectReason, setRejectReason] = useState("");
 
   const API = import.meta.env.VITE_API_BASE_URL;
-  const token = localStorage.getItem("jwtToken");
+  const token = localStorage.getItem("accessToken");
   const navigate = useNavigate();
 
   // 1) 데이터 로드

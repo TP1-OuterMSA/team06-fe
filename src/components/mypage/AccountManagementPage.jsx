@@ -23,7 +23,7 @@ function AccountManagementPage() {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("jwtToken");
+      const token = localStorage.getItem("accessToken");
       axios.defaults.headers.common.Authorization = `Bearer ${token}`;
 
       const { data: updatedUser } = await axios.patch(
