@@ -19,7 +19,7 @@ export function UserProvider({ children }) {
         .then((res) => setUser(res.data))
         .catch(() => {
           // 토큰이 만료됐거나 유효하지 않으면 초기화
-          localStorage.removeItem("jwtToken");
+          localStorage.removeItem("accessToken");
           delete axios.defaults.headers.common.Authorization;
         });
     }
@@ -27,7 +27,6 @@ export function UserProvider({ children }) {
 
   const login = (userDto) => {
     // 로그인 성공 시 호출하는 유틸
- 
     setUser(userDto);
     localStorage.setItem("accessToken", userDto.accessToken);
     axios.defaults.headers.common.Authorization = `Bearer ${userDto.accessToken}`;
