@@ -21,12 +21,10 @@ export default function Login() {
       console.log(response)
       let userDto = response.data;
 
-      // UserContext 에 저장 및 axios 헤더 자동 설정
-      login(userDto);
-      console.log(userDto)
-
-      // 메인(마이페이지)으로 이동
-      navigate("/mypage");
+    // login() 이 /me 호출까지 끝날 때까지 기다렸다가
+    await login(userDto);
+    // 그 다음에 마이페이지로 이동
+    navigate("/mypage");
     } catch (error) {
       console.error("로그인 실패:", error);
       alert("로그인 정보가 잘못되었습니다.");

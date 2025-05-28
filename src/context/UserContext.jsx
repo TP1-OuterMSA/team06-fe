@@ -1,41 +1,130 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
+// Allow sending HttpOnly cookies
 axios.defaults.withCredentials = true;
 
 export const UserContext = createContext();
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [initialized, setInitialized] = useState(false);
+  let isRefreshing = false;
+  let failedQueue = [];
 
-  // 앱 초기화 시: localStorage 에 토큰이 남아 있으면 axios 헤더에 설정하고
-  // /me 로 유저 정보 가져와서 Context 채우기
+  const processQueue = (error, token = null) => {
+    failedQueue.forEach(prom => {
+      if (error) prom.reject(error);
+      else      prom.resolve(token);
+    });
+    failedQueue = [];
+  };
+
+  const loadUser = useCallback(async () => {
+    try {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/user/me`
+      );
+      setUser(data);
+    } catch (e) {
+      setUser(null);
+    } finally {
+      setInitialized(true);
+    }
+  }, []);
+    
+  useEffect(() => {
+    loadUser();
+  }, [loadUser]);
+
+    // Logout helper
+  const logout = useCallback(() => {
+    setUser(null);
+    localStorage.removeItem("accessToken");
+    delete axios.defaults.headers.common.Authorization;
+  }, []);
+
+    // Interceptor: on 401, try refreshing access token using HttpOnly refresh token
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      res => res,
+      err => {
+        const originalRequest = err.config;
+        if (err.response?.status === 401 && !originalRequest._retry) {
+          // 첫 번째 401이면
+          originalRequest._retry = true;
+
+          if (isRefreshing) {
+            // 이미 리프레시 중이라면 큐에 넣고 기다렸다 재시도
+            return new Promise((resolve, reject) => {
+              failedQueue.push({ resolve, reject });
+            }).then(token => {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              return axios(originalRequest);
+            });
+          }
+
+          // 아직 리프레시 시도를 안 했다면
+          isRefreshing = true;
+          return new Promise((resolve, reject) => {
+            axios.post(
+              `${import.meta.env.VITE_API_BASE_URL}/api/auth/user/refresh`
+            )
+              .then(({ data }) => {
+                const newToken = data.accessToken;
+                localStorage.setItem("accessToken", newToken);
+                axios.defaults.headers.common.Authorization = `Bearer ${newToken}`;
+                processQueue(null, newToken);
+                // 원래 요청도 토큰 갱신 후 재시도
+                originalRequest.headers.Authorization = `Bearer ${newToken}`;
+                resolve(axios(originalRequest));
+              })
+              .catch(refreshError => {
+                processQueue(refreshError, null);
+                logout();
+                reject(refreshError);
+              })
+              .finally(() => {
+                isRefreshing = false;
+              });
+          });
+        }
+        return Promise.reject(err);
+      }
+    );
+    return () => axios.interceptors.response.eject(interceptor);
+  }, [logout]);
+
+  // On app init: load AT from storage and fetch user profile
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     if (token) {
       axios.defaults.headers.common.Authorization = `Bearer ${token}`;
       axios
         .get(`${import.meta.env.VITE_API_BASE_URL}/api/team6/user/me`)
-        .then((res) => setUser(res.data))
+        .then(res => setUser(res.data))
         .catch(() => {
-          // 토큰이 만료됐거나 유효하지 않으면 초기화
+          // Clear invalid token
           localStorage.removeItem("accessToken");
           delete axios.defaults.headers.common.Authorization;
         });
     }
   }, []);
 
-  const login = (userDto) => {
-    // 로그인 성공 시 호출하는 유틸
-    setUser(userDto);
-    localStorage.setItem("accessToken", userDto.accessToken);
-    axios.defaults.headers.common.Authorization = `Bearer ${userDto.accessToken}`;
-  };
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("accessToken");
-    delete axios.defaults.headers.common.Authorization;
+  // Login: store AT and fetch profile
+  const login = async ({ accessToken }) => {
+    if (accessToken) {
+      localStorage.setItem("accessToken", accessToken);
+      axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/api/team6/user/me`
+        );
+        setUser(res.data);
+      } catch {
+        logout();
+      }
+    }
   };
 
   return (
