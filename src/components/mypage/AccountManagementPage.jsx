@@ -11,6 +11,7 @@ function AccountManagementPage() {
   const [profileImageFile, setProfileImageFile] = useState(null);
   const [promotionStatus, setPromotionStatus] = useState(null);
   const [loadingRequest, setLoadingRequest] = useState(false);
+  
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
   const handleImageChange = (e) => {
@@ -30,7 +31,7 @@ function AccountManagementPage() {
         `${API_BASE}/api/team6/user/update`,
         { nickname, email }
       );
-
+      
       if (profileImageFile) {
         const form = new FormData();
         form.append("file", profileImageFile);
@@ -41,7 +42,7 @@ function AccountManagementPage() {
           { headers: { Authorization: `Bearer ${token}` } }
         );
       }
-
+      
       setUser({
         ...updatedUser,
         nickname,

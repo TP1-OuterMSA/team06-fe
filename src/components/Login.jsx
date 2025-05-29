@@ -17,7 +17,6 @@ export default function Login() {
         `${import.meta.env.VITE_API_BASE_URL}/api/auth/user/login`,
         { username, password }
       );
-
       console.log(response)
       let userDto = response.data;
 
@@ -25,6 +24,7 @@ export default function Login() {
     await login(userDto);
     // 그 다음에 마이페이지로 이동
     navigate("/mypage");
+
     } catch (error) {
       console.error("로그인 실패:", error);
       alert("로그인 정보가 잘못되었습니다.");
