@@ -35,7 +35,7 @@ function AllergyInfoPage() {
   const fetchMyAllergies = async () => {
     try {
       const { data } = await axios.get(
-        `${API_BASE}/api/team6/userAllergy/${user.id}`
+        `${API_BASE}/api/team6/user/userAllergy/me`
       );
       setSelectedAllergies(data.allergies);
     } catch (err) {
@@ -62,7 +62,7 @@ function AllergyInfoPage() {
   const handleSave = async () => {
     try {
       await axios.put(
-        `${API_BASE}/api/team6/userAllergy/update`,
+        `${API_BASE}/api/team6/user/userAllergy/update`,
         {
           userId: user.id,
           allergies: selectedAllergies.map((a) => a.id),
