@@ -1,26 +1,49 @@
-import React from "react";
-import FavoriteItem from "./FavoriteItem";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function FavoritesSection() {
-  const favorites = [
-    {
-      category: "MAIN",
-      items: [{ name: "김치찌개" }, { name: "불고기" }],
-    },
-    {
-      category: "DESSERT",
-      items: [{ name: "케이크" }, { name: "빙수" }],
-    },
-    {
-      category: "SIDE",
-      items: [{ name: "샐러드" }, { name: "도토리묵무침" }],
-    },
-  ];
+  const [favorites, setFavorites] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const navigate = useNavigate();
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
-  const [selectedCategory, setSelectedCategory] = useState(
-    favorites[0].category
-  );
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const userId = localStorage.getItem("userId");
+
+        const res = await axios.get(
+          `${API_BASE}/api/team6/user/meal/favorite`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              userId: userId,
+            },
+          }
+        );
+
+        const data = res.data; // [{ id, name, category }]
+        const grouped = data.reduce((acc, item) => {
+          const category = item.category.toUpperCase();
+          if (!acc[category]) {
+            acc[category] = { category, items: [] };
+          }
+          acc[category].items.push({ name: item.name });
+          return acc;
+        }, {});
+
+        const groupedList = Object.values(grouped);
+        setFavorites(groupedList);
+        setSelectedCategory(groupedList[0]?.category || "");
+      } catch (err) {
+        console.error("좋아하는 메뉴 불러오기 실패:", err);
+      }
+    };
+
+    fetchFavorites();
+  }, []);
 
   const currentItems =
     favorites.find((f) => f.category === selectedCategory)?.items || [];
@@ -30,6 +53,7 @@ function FavoritesSection() {
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold">좋아하는 메뉴</h3>
         <button
+          onClick={() => navigate("/team6/mypage/favorites")}
           className="text-sm text-blue-500 hover:underline"
         >
           + 추가하러 가기
@@ -56,7 +80,6 @@ function FavoritesSection() {
           ))}
         </div>
 
-        {/* 내용 해시태그 */}
         <div className="flex flex-wrap gap-2 pt-1">
           {currentItems.map((item, idx) => (
             <span
