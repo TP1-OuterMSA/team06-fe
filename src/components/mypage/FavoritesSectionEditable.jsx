@@ -2,39 +2,64 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 function FavoritesSectionEditable() {
+  const [mealList, setMealList] = useState([]);
+  const [favoriteIds, setFavoriteIds] = useState(new Set());
   const [favorites, setFavorites] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [loading, setLoading] = useState(true);
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
-  const getMealList = async () => {
-    try {
-      const res = await axios.get(`${API_BASE}/api/team6/meal/list`);
-      const data = res.data;
-      console.log("식단 목록:", data);
+  const fetchMealList = async () => {
+    const res = await axios.get(`${API_BASE}/api/team6/meal/list`);
+    return res.data;
+  };
 
-      // 카테고리별로 그룹화
-      const grouped = data.reduce((acc, item) => {
-        const category = item.category.toUpperCase();
-        if (!acc[category]) {
-          acc[category] = { category, allItems: [], selected: [] };
-        }
-        acc[category].allItems.push(item);
-        return acc;
-      }, {});
+  const fetchFavoriteIds = async () => {
+    const token = localStorage.getItem("accessToken");
+    const res = await axios.get(`${API_BASE}/api/team6/user/meal/favorite`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return new Set(res.data.map((item) => item.id));
+  };
 
-      const formatted = Object.values(grouped);
-      setFavorites(formatted);
-      setSelectedCategory(formatted[0]?.category || "");
-    } catch (error) {
-      console.error("식단 목록 불러오기 실패:", error);
-    } finally {
-      setLoading(false);
-    }
+  const buildGroupedFavorites = (meals, favIds) => {
+    const grouped = meals.reduce((acc, item) => {
+      const category = item.category.toUpperCase();
+      if (!acc[category]) {
+        acc[category] = { category, allItems: [], selected: [] };
+      }
+      acc[category].allItems.push(item);
+      if (favIds.has(item.id)) {
+        acc[category].selected.push(item.name);
+      }
+      return acc;
+    }, {});
+    return Object.values(grouped);
   };
 
   useEffect(() => {
-    getMealList();
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const [meals, favIds] = await Promise.all([
+          fetchMealList(),
+          fetchFavoriteIds(),
+        ]);
+        setMealList(meals);
+        setFavoriteIds(favIds);
+        const grouped = buildGroupedFavorites(meals, favIds);
+        setFavorites(grouped);
+        setSelectedCategory(grouped[0]?.category || "");
+      } catch (err) {
+        console.error("초기 데이터 로딩 실패:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, []);
 
   const toggleItem = (category, itemName) => {
@@ -49,11 +74,6 @@ function FavoritesSectionEditable() {
       })
     );
   };
-
-  const currentGroup = favorites.find((f) => f.category === selectedCategory);
-
-  if (loading) return <div>불러오는 중...</div>;
-  if (!currentGroup) return <div>해당 카테고리의 메뉴가 없습니다.</div>;
 
   const handleSave = async () => {
     const token = localStorage.getItem("accessToken");
@@ -70,13 +90,9 @@ function FavoritesSectionEditable() {
       }
       await axios.post(
         `${API_BASE}/api/team6/user/meal/favorite`,
+        { meals: selectedMealIds },
         {
-          meals: selectedMealIds,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
       alert("저장되었습니다.");
@@ -85,6 +101,11 @@ function FavoritesSectionEditable() {
       alert("저장 중 오류 발생");
     }
   };
+
+  const currentGroup = favorites.find((f) => f.category === selectedCategory);
+
+  if (loading) return <div>불러오는 중...</div>;
+  if (!currentGroup) return <div>해당 카테고리의 메뉴가 없습니다.</div>;
 
   return (
     <div className="space-y-4 max-w-md">
@@ -108,7 +129,7 @@ function FavoritesSectionEditable() {
         ))}
       </div>
 
-      {/* 항목 전체 리스트 (세로 스크롤) */}
+      {/* 항목 전체 리스트 */}
       <div className="max-h-[32rem] overflow-y-auto border border-gray-200 rounded">
         <ul className="divide-y divide-gray-100">
           {currentGroup.allItems.map((item, idx) => {
@@ -122,7 +143,9 @@ function FavoritesSectionEditable() {
                   {item.name}
                 </span>
                 <button
-                  onClick={() => toggleItem(currentGroup.category, item.name)}
+                  onClick={() =>
+                    toggleItem(currentGroup.category, item.name)
+                  }
                   className={`w-20 text-sm rounded text-center py-1 px-0 ${
                     isSelected
                       ? "bg-blue-100 text-blue-700 border border-blue-300"
@@ -154,10 +177,11 @@ function FavoritesSectionEditable() {
         </div>
       </div>
 
+      {/* 저장 버튼 */}
       <div className="text-right pt-4">
         <button
-          onClick={() => handleSave()}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-sky-500 text-sm"
+          onClick={handleSave}
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400 text-sm"
         >
           저장하기
         </button>
