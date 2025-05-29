@@ -19,7 +19,7 @@ function FavoritesSectionEditable() {
         if (!acc[category]) {
           acc[category] = { category, allItems: [], selected: [] };
         }
-        acc[category].allItems.push(item.name);
+        acc[category].allItems.push(item);
         return acc;
       }, {});
 
@@ -37,26 +37,17 @@ function FavoritesSectionEditable() {
     getMealList();
   }, []);
 
-  const toggleItem = (category, item) => {
+  const toggleItem = (category, itemName) => {
     setFavorites((prev) =>
       prev.map((f) => {
         if (f.category !== category) return f;
-        const isSelected = f.selected.includes(item);
+        const isSelected = f.selected.includes(itemName);
         const updated = isSelected
-          ? f.selected.filter((i) => i !== item)
-          : [...f.selected, item];
+          ? f.selected.filter((i) => i !== itemName)
+          : [...f.selected, itemName];
         return { ...f, selected: updated };
       })
     );
-  };
-
-  const handleSave = () => {
-    const result = favorites.reduce((acc, cur) => {
-      acc[cur.category] = cur.selected;
-      return acc;
-    }, {});
-    console.log("저장된 즐겨찾기:", result);
-    alert("저장되었습니다.");
   };
 
   const currentGroup = favorites.find((f) => f.category === selectedCategory);
@@ -64,10 +55,41 @@ function FavoritesSectionEditable() {
   if (loading) return <div>불러오는 중...</div>;
   if (!currentGroup) return <div>해당 카테고리의 메뉴가 없습니다.</div>;
 
+  const handleSave = async () => {
+    const token = localStorage.getItem("accessToken");
+    const selectedMealIds = favorites.flatMap((group) =>
+      group.allItems
+        .filter((item) => group.selected.includes(item.name))
+        .map((item) => item.id)
+    );
+
+    try {
+      if (selectedMealIds.length === 0) {
+        alert("선택된 메뉴가 없습니다.");
+        return;
+      }
+      await axios.post(
+        `${API_BASE}/api/team6/user/meal/favorite`,
+        {
+          meals: selectedMealIds,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      alert("저장되었습니다.");
+    } catch (err) {
+      console.error("저장 실패:", err);
+      alert("저장 중 오류 발생");
+    }
+  };
+
   return (
     <div className="space-y-4 max-w-md">
       {/* 카테고리 선택 */}
-       <div className="flex flex-nowrap text-base font-medium text-gray-400 gap-x-3">
+      <div className="flex flex-nowrap text-base font-medium text-gray-400 gap-x-3">
         {favorites.map((group, idx) => (
           <span
             key={idx}
@@ -90,17 +112,17 @@ function FavoritesSectionEditable() {
       <div className="max-h-[32rem] overflow-y-auto border border-gray-200 rounded">
         <ul className="divide-y divide-gray-100">
           {currentGroup.allItems.map((item, idx) => {
-            const isSelected = currentGroup.selected.includes(item);
+            const isSelected = currentGroup.selected.includes(item.name);
             return (
               <li
                 key={idx}
                 className="flex items-center justify-between px-3 py-3"
               >
                 <span className="text-sm text-gray-800 truncate max-w-[10rem]">
-                  {item}
+                  {item.name}
                 </span>
                 <button
-                  onClick={() => toggleItem(currentGroup.category, item)}
+                  onClick={() => toggleItem(currentGroup.category, item.name)}
                   className={`w-20 text-sm rounded text-center py-1 px-0 ${
                     isSelected
                       ? "bg-blue-100 text-blue-700 border border-blue-300"
@@ -117,7 +139,9 @@ function FavoritesSectionEditable() {
 
       {/* 선택된 항목 미리보기 */}
       <div className="py-4">
-        <h4 className="text-base font-semibold mb-5 text-gray-700">메뉴 목록</h4>
+        <h4 className="text-base font-semibold mb-5 text-gray-700">
+          메뉴 목록
+        </h4>
         <div className="flex flex-wrap gap-2">
           {currentGroup.selected.map((item, idx) => (
             <span
@@ -132,7 +156,7 @@ function FavoritesSectionEditable() {
 
       <div className="text-right pt-4">
         <button
-          onClick={handleSave}
+          onClick={() => handleSave()}
           className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-sky-500 text-sm"
         >
           저장하기
