@@ -10,6 +10,7 @@ import RequireAdmin from "./components/mypage/RequireAdmin";
 import AdminDashboard from "./components/mypage/AdminDashboard";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./context/UserContext";
+import FavoritesPage from "./components/mypage/FavoritesPage";
 
 function App() { 
   return ( 
@@ -28,6 +29,7 @@ function App() {
           <Route path="/mypage" element={<Mypage />} />
           <Route path="/mypage/allergies" element={<AllergyInfoPage />} />
           <Route path="/mypage/account" element={<AccountManagementPage />} />
+          <Route path="/mypage/favorites" element={<FavoritesPage/>} />
 
           {/* Admin-only pages (RequireAdmin reads UserContext.role) */}
           <Route
