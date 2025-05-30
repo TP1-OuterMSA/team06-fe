@@ -17,7 +17,7 @@ function Mypage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("jwtToken");
+        const token = localStorage.getItem("accessToken");
         axios.defaults.headers.common.Authorization = `Bearer ${token}`;
 
         const { data } = await axios.get(
@@ -41,7 +41,7 @@ function Mypage() {
           <>
             <ProfileImage
               apiBaseUrl={API_BASE}
-              token={localStorage.getItem('jwtToken')}
+              token={localStorage.getItem('accessToken')}
             />
             <Header
               nickname={myInfo.nickname}
