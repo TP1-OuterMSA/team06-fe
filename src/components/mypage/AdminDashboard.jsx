@@ -29,14 +29,14 @@ export default function AdminDashboard() {
   // 1) 데이터 로드
   const fetchPromo = async () => {
     const { data } = await axios.get(
-      `${API}/api/team6/user/promotion/pending`,
+      `${API}/api/team6/admin/promotion/pending`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     setPromoReqs(data);
   };
   const fetchAllergy = async () => {
     const { data } = await axios.get(
-      `${API}/api/team6/user/allergy-request/pending`,
+      `${API}/api/team6/admin/allergy-request/pending`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     setAllergyReqs(data);
@@ -49,7 +49,7 @@ export default function AdminDashboard() {
   // 2) 승인
   const handleApprove = async (type, id) => {
     await axios.post(
-      `${API}/api/team6/user/${type}-request/approve/${id}`,
+      `${API}/api/team6/admin/${type}-request/approve/${id}`,
       null,
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -75,8 +75,8 @@ const confirmReject = async () => {
 
     const endpoint =
       type === "promotion"
-        ? `/api/team6/user/promotion/reject/${id}`
-        : `/api/team6/user/allergy-request/reject/${id}`;
+        ? `/api/team6/admin/promotion/reject/${id}`
+        : `/api/team6/admin/allergy-request/reject/${id}`;
 
     const url = `${API}${endpoint}`;
     console.log("거절 호출 URL:", url);
