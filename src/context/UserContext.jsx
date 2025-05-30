@@ -23,7 +23,7 @@ export function UserProvider({ children }) {
   const loadUser = useCallback(async () => {
     try {
       const { data } = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/api/auth/user/me`
+        `${import.meta.env.VITE_API_BASE_URL}/api/team6/user/me`
       );
       setUser(data);
     } catch (e) {
