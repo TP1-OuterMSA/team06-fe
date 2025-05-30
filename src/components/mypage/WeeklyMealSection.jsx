@@ -82,7 +82,7 @@ function WeeklyMealSection() {
                           <span
                             className={
                               favoriteNames.has(name)
-                                ? "bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-semibold"
+                                ? "bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm font-semibold"
                                 : "text-gray-700 text-sm"
                             }
                           >

@@ -15,7 +15,7 @@ function Header() {
 
   return (
     <div className="flex justify-between items-center mt-6 mb-6">
-      <h2 className="text-xl font-semibold">내 정보</h2>
+      <h3 className="text-lg font-semibold">내 알레르기 정보</h3>
       <button className="bg-gray-800 text-white px-4 py-2 rounded-md" onClick={() => handleLogout()}>로그아웃</button>
     </div>
   );
