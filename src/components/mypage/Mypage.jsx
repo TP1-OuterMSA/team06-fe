@@ -48,6 +48,7 @@ function Mypage() {
               email={myInfo.email}
             />
             <AllergyInfoCard allergies={myInfo.allergies} />
+            {/* <TodayMealCard/> */}
             <NotificationSettings />
             <FavoritesSection />
           </>

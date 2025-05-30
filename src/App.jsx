@@ -11,6 +11,7 @@ import AdminDashboard from "./components/mypage/AdminDashboard";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./context/UserContext";
 import FavoritesPage from "./components/mypage/FavoritesPage";
+import WeeklyMealPage from "./components/mypage/WeeklyMealPage";
 
 function App() { 
   return ( 
@@ -30,6 +31,7 @@ function App() {
           <Route path="/mypage/allergies" element={<AllergyInfoPage />} />
           <Route path="/mypage/account" element={<AccountManagementPage />} />
           <Route path="/mypage/favorites" element={<FavoritesPage/>} />
+          <Route path="/mypage/weekly" element={<WeeklyMealPage/>} />
 
           {/* Admin-only pages (RequireAdmin reads UserContext.role) */}
           <Route

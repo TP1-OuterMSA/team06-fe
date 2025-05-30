@@ -26,6 +26,8 @@ function FavoritesSectionEditable() {
 
   const buildGroupedFavorites = (meals, favIds) => {
     const grouped = meals.reduce((acc, item) => {
+      if (!item.category) return acc;
+
       const category = item.category.toUpperCase();
       if (!acc[category]) {
         acc[category] = { category, allItems: [], selected: [] };
