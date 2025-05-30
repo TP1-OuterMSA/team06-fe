@@ -22,11 +22,11 @@ console.log("Sidebar user context:", user);
 
   return (
     <aside className="w-[280px] bg-white p-5 border-r border-gray-200">
-      <div className="text-center border-b border-gray-200 py-6">
+      <div className="flex flex-col items-center border-b border-gray-200 py-6">
         <ProfileImage
           apiBaseUrl={apiBaseUrl}
           token={token}
-          className="w-32 h-32 rounded-full object-cover mx-auto mb-4 border border-gray-300"
+          className="w-32 h-32 rounded-full object-cover mb-4 border border-gray-300 block"
         />
         <div className="text-lg font-bold">
           {user ? user.nickname : "게스트"}
