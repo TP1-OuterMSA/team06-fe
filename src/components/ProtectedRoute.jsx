@@ -22,7 +22,7 @@ export default function ProtectedRoute() {
   const token = localStorage.getItem('accessToken');
   
   // 토큰이 없거나 사용자 정보가 없으면 로그인 페이지로 리다이렉트
-  if (!token || !user) {
+  if (!token || !user) { 
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

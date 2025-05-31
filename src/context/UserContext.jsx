@@ -20,47 +20,67 @@ export function UserProvider({ children }) {
     failedQueue = [];
   };
 
-  const loadUser = useCallback(async () => {
-    try {
-      const { data } = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/api/team6/user/me`
-      );
-      setUser(data);
-    } catch (e) {
-      setUser(null);
-    } finally {
+  // const loadUser = useCallback(async () => {
+  //   try {
+  //     const { data } = await axios.get(
+  //       `${import.meta.env.VITE_API_BASE_URL}/api/team6/user/me`
+  //     );
+  //     setUser(data);
+  //   } catch (e) {
+  //     setUser(null);
+  //   } finally {
+  //     setInitialized(true);
+  //   }
+  // }, []);
+    
+  // useEffect(() => {
+  //   loadUser();
+  // }, [loadUser]);
+  // ─── (B) 앱 최초 마운트 시, localStorage에서 AT를 꺼내 헤더 설정 + /me 호출 ─────
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+      axios
+        .get(`${import.meta.env.VITE_API_BASE_URL}/api/team6/user/me`)
+        .then(res => {
+          setUser(res.data);
+        })
+        .catch(() => {
+          // AT가 만료됐거나 유효하지 않으면 수동 로그아웃
+          localStorage.removeItem("accessToken");
+          delete axios.defaults.headers.common.Authorization;
+        })
+        .finally(() => {
+          // 유저 정보를 가져왔든 실패했든 초기화 완료
+          setInitialized(true);
+        });
+    } else {
+      // 토큰 자체가 없으면 그냥 초기화 완료
       setInitialized(true);
     }
   }, []);
-    
-  useEffect(() => {
-    loadUser();
-  }, [loadUser]);
+  // ───────────────────────────────────────────────────────────────────
 
-  // Logout helper with optional redirect
+  // ─── 인터셉터 로직 (401 발생 시 RT로 재발급 시도) ─────
   const logout = useCallback((redirectToLogin = false) => {
     setUser(null);
     localStorage.removeItem("accessToken");
     delete axios.defaults.headers.common.Authorization;
-    
-    // 새로고침
+
     if (redirectToLogin) {
       window.location.reload();
     }
   }, []);
 
-  // Interceptor: on 401, try refreshing access token using HttpOnly refresh token
   useEffect(() => {
     const interceptor = axios.interceptors.response.use(
       res => res,
       err => {
         const originalRequest = err.config;
         if (err.response?.status === 401 && !originalRequest._retry) {
-          // 첫 번째 401이면
           originalRequest._retry = true;
-
           if (isRefreshing) {
-            // 이미 리프레시 중이라면 큐에 넣고 기다렸다 재시도
             return new Promise((resolve, reject) => {
               failedQueue.push({ resolve, reject });
             }).then(token => {
@@ -69,34 +89,28 @@ export function UserProvider({ children }) {
             });
           }
 
-          // 아직 리프레시 시도를 안 했다면
           isRefreshing = true;
           return new Promise((resolve, reject) => {
-            axios.post(
-              `${import.meta.env.VITE_API_BASE_URL}/api/auth/user/refresh`
-            )
+            axios
+              .post(
+                `${import.meta.env.VITE_API_BASE_URL}${import.meta.env.VITE_AUTH_SERVICE_PREFIX}/auth/user/refresh`
+              )
               .then(({ data }) => {
                 const newToken = data.accessToken;
                 localStorage.setItem("accessToken", newToken);
                 axios.defaults.headers.common.Authorization = `Bearer ${newToken}`;
                 processQueue(null, newToken);
-                // 원래 요청도 토큰 갱신 후 재시도
                 originalRequest.headers.Authorization = `Bearer ${newToken}`;
                 resolve(axios(originalRequest));
               })
               .catch(refreshError => {
                 processQueue(refreshError, null);
-                
-                // 403 에러인 경우 로그아웃 후 로그인 페이지로 리다이렉트
-                if (refreshError.response?.status === 403 && originalRequest._retry === false) { // 
-                  console.log('Refresh token expired or invalid. Redirecting to login...');
-                  
-                  logout(); // 로그인 페이지로 리다이렉트
-                } else {
+                if (refreshError.response?.status === 403) {
                   alert("사용자 정보 갱신에 실패했습니다. 다시 로그인해 주세요.");
-                  logout(); // 일반 로그아웃
+                  logout(true);
+                } else {
+                  logout(true);
                 }
-                
                 reject(refreshError);
               })
               .finally(() => {
@@ -110,23 +124,7 @@ export function UserProvider({ children }) {
     return () => axios.interceptors.response.eject(interceptor);
   }, [logout]);
 
-  // On app init: load AT from storage and fetch user profile
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-      axios
-        .get(`${import.meta.env.VITE_API_BASE_URL}/api/team6/user/me`)
-        .then(res => setUser(res.data))
-        .catch(() => {
-          // Clear invalid token
-          localStorage.removeItem("accessToken");
-          delete axios.defaults.headers.common.Authorization;
-        });
-    }
-  }, []);
-
-  // Login: store AT and fetch profile
+  // ─── 로그인 함수 (AT를 세팅하고 /me 호출) ─────
   const login = async ({ accessToken }) => {
     if (accessToken) {
       localStorage.setItem("accessToken", accessToken);
