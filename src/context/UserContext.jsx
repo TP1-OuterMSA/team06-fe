@@ -37,14 +37,19 @@ export function UserProvider({ children }) {
     loadUser();
   }, [loadUser]);
 
-    // Logout helper
-  const logout = useCallback(() => {
+  // Logout helper with optional redirect
+  const logout = useCallback((redirectToLogin = false) => {
     setUser(null);
     localStorage.removeItem("accessToken");
     delete axios.defaults.headers.common.Authorization;
+    
+    // 새로고침
+    if (redirectToLogin) {
+      window.location.reload();
+    }
   }, []);
 
-    // Interceptor: on 401, try refreshing access token using HttpOnly refresh token
+  // Interceptor: on 401, try refreshing access token using HttpOnly refresh token
   useEffect(() => {
     const interceptor = axios.interceptors.response.use(
       res => res,
@@ -81,7 +86,17 @@ export function UserProvider({ children }) {
               })
               .catch(refreshError => {
                 processQueue(refreshError, null);
-                logout();
+                
+                // 403 에러인 경우 로그아웃 후 로그인 페이지로 리다이렉트
+                if (refreshError.response?.status === 403 && originalRequest._retry === false) { // 
+                  console.log('Refresh token expired or invalid. Redirecting to login...');
+                  
+                  logout(); // 로그인 페이지로 리다이렉트
+                } else {
+                  alert("사용자 정보 갱신에 실패했습니다. 다시 로그인해 주세요.");
+                  logout(); // 일반 로그아웃
+                }
+                
                 reject(refreshError);
               })
               .finally(() => {
@@ -128,7 +143,7 @@ export function UserProvider({ children }) {
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser, login, logout }}>
+    <UserContext.Provider value={{ user, setUser, login, logout, initialized }}>
       {children}
     </UserContext.Provider>
   );
