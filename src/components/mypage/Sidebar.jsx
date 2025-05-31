@@ -4,21 +4,18 @@ import { UserContext } from "../../context/UserContext";
 import ProfileImage from "../common/ProfileImage";
 
 const menuItems = [
-  { icon: "😎", label: "마이페이지",       to: "/mypage" },
-  { icon: "🍽️", label: "주간 식단표",     to: "/mypage/weekly" },
-  { icon: "♥️", label: "좋아하는 메뉴",       to: "/mypage/favorites" },
+  { icon: "😎", label: "마이페이지", to: "/mypage" },
+  { icon: "🍽️", label: "주간 식단표", to: "/mypage/weekly" },
+  { icon: "♥️", label: "좋아하는 메뉴", to: "/mypage/favorites" },
   { icon: "📢", label: "알레르기 정보", to: "/mypage/allergies" },
-  { icon: "⚙️", label: "계정 관리",     to: "/mypage/account" },
-  { icon: "🛠️", label: "Admin 대시보드", to: "/admin", adminOnly: true }
+  { icon: "⚙️", label: "계정 관리", to: "/mypage/account" },
+  { icon: "🛠️", label: "Admin 대시보드", to: "/admin", adminOnly: true },
 ];
 
-
-function Sidebar() {
+function Sidebar({ refresh }) {
   const { user } = useContext(UserContext);
   const token = localStorage.getItem("accessToken");
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
-console.log("Sidebar user context:", user);
 
   return (
     <aside className="w-[280px] bg-white p-5 border-r border-gray-200">
@@ -26,6 +23,7 @@ console.log("Sidebar user context:", user);
         <ProfileImage
           apiBaseUrl={apiBaseUrl}
           token={token}
+          refresh={refresh}
           className="w-32 h-32 rounded-full object-cover mb-4 border border-gray-300 block"
         />
         <div className="text-lg font-bold">
