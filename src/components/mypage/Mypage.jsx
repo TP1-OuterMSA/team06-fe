@@ -8,6 +8,7 @@ import NotificationSettings from "./NotificationSettings";
 import FavoritesSection from "./FavoritesSection";
 import ProfileImage from "../common/ProfileImage";
 import axios from "axios";
+import TodayMealSection from "./TodayMealCard";
 
 function Mypage() {
   const { user } = useContext(UserContext);
@@ -39,16 +40,17 @@ function Mypage() {
       <main className="flex-1 p-5">
         {myInfo && (
           <>
-            <ProfileImage
+            {/* <ProfileImage
               apiBaseUrl={API_BASE}
               token={localStorage.getItem('accessToken')}
-            />
+            /> */}
             <Header
               nickname={myInfo.nickname}
               email={myInfo.email}
             />
             <AllergyInfoCard allergies={myInfo.allergies} />
-            <NotificationSettings />
+            <TodayMealSection/>
+            {/* <NotificationSettings /> */}
             <FavoritesSection />
           </>
         )}
