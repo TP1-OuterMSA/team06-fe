@@ -4,10 +4,10 @@ import { UserContext } from "../../context/UserContext";
 import ProfileImage from "../common/ProfileImage";
 
 const menuItems = [
-  { icon: "📢", label: "알레르기 정보", to: "/mypage/allergies" },
-  { icon: "😎", label: "프로필",       to: "/mypage" },
-  { icon: "🔔", label: "알림 설정",     to: "/mypage/notifications" },
+  { icon: "😎", label: "마이페이지",       to: "/mypage" },
+  { icon: "🍽️", label: "주간 식단표",     to: "/mypage/weekly" },
   { icon: "♥️", label: "좋아하는 메뉴",       to: "/mypage/favorites" },
+  { icon: "📢", label: "알레르기 정보", to: "/mypage/allergies" },
   { icon: "⚙️", label: "계정 관리",     to: "/mypage/account" },
   { icon: "🛠️", label: "Admin 대시보드", to: "/admin", adminOnly: true }
 ];
