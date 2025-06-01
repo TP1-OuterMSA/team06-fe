@@ -77,7 +77,9 @@ function Register() {
     };
 
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/user/signup`, requestData);
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}${import.meta.env.VITE_AUTH_SERVICE_PREFIX}/auth/user/signup`,
+         requestData);
 
       console.log("회원가입 성공:", res.data);
       setIsModalOpen(true);

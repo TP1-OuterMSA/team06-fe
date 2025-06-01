@@ -1,11 +1,15 @@
 import React, { useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { UserContext } from "../context/UserContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useContext(UserContext);
+
+  // 원래 가려던 페이지 정보 (ProtectedRoute에서 전달됨)
+  const from = location.state?.from?.pathname || "/mypage";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -14,16 +18,17 @@ export default function Login() {
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/auth/user/login`,
+        `${import.meta.env.VITE_API_BASE_URL}${import.meta.env.VITE_AUTH_SERVICE_PREFIX}/auth/user/login`,
         { username, password }
       );
-      console.log(response)
+      console.log(response);
       let userDto = response.data;
 
-    // login() 이 /me 호출까지 끝날 때까지 기다렸다가
-    await login(userDto);
-    // 그 다음에 마이페이지로 이동
-    navigate("/mypage");
+      // login() 이 /me 호출까지 끝날 때까지 기다렸다가
+      await login(userDto);
+      
+      // 원래 가려던 페이지로 이동 (없으면 마이페이지)
+      navigate(from, { replace: true });
 
     } catch (error) {
       console.error("로그인 실패:", error);

@@ -8,6 +8,8 @@ import AllergyInfoPage from "./components/mypage/AllergyInfoPage";
 import AccountManagementPage from "./components/mypage/AccountManagementPage";
 import RequireAdmin from "./components/mypage/RequireAdmin";
 import AdminDashboard from "./components/mypage/AdminDashboard";
+import Home from "./components/Home";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./context/UserContext";
 import FavoritesPage from "./components/mypage/FavoritesPage";
@@ -18,6 +20,9 @@ function App() {
     <UserProvider>
       <BrowserRouter basename="/team6">
         <Routes>
+          {/* Root path - 토큰 확인 후 자동 리다이렉트 */}
+          <Route path="/" element={<Home />} />
+
           {/* Public pages */}
           <Route path="/login" element={<Login />} /> 
           <Route path="/register" element={<Register />} />
@@ -27,11 +32,14 @@ function App() {
           <Route path="/congestion" element={<MealCongestionGraph />} />
 
           {/* User pages (token automatically attached) */}
-          <Route path="/mypage" element={<Mypage />} />
-          <Route path="/mypage/allergies" element={<AllergyInfoPage />} />
-          <Route path="/mypage/account" element={<AccountManagementPage />} />
-          <Route path="/mypage/favorites" element={<FavoritesPage/>} />
-          <Route path="/mypage/weekly" element={<WeeklyMealPage/>} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/mypage" element={<Mypage />} />
+            <Route path="/mypage/allergies" element={<AllergyInfoPage />} />
+            <Route path="/mypage/account" element={<AccountManagementPage />} />
+            <Route path="/mypage/favorites" element={<FavoritesPage/>} />
+            <Route path="/mypage/weekly" element={<WeeklyMealPage/>} />
+          </Route>
+
 
           {/* Admin-only pages (RequireAdmin reads UserContext.role) */}
           <Route

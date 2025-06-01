@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import defaultImage from "../../../public/default-profile.png"
+import defaultImage from "../../../public/default-profile.png";
 
-export default function ProfileImage({ apiBaseUrl, token }) {
+export default function ProfileImage({ apiBaseUrl, token, refresh, className }) {
   const [imgSrc, setImgSrc] = useState(null);
 
   useEffect(() => {
@@ -25,22 +25,24 @@ export default function ProfileImage({ apiBaseUrl, token }) {
       }
     };
 
-    fetchImage();
+    if (token && apiBaseUrl) {
+      fetchImage();
+    }
 
     return () => {
       if (objectUrl) {
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [apiBaseUrl, token]);
+  }, [apiBaseUrl, token, refresh]);
 
-  // 로딩 또는 실패 시 보여줄 기본 이미지
   const placeholder = defaultImage;
+
   return (
     <img
       src={imgSrc || placeholder}
       alt="프로필"
-      className="w-32 h-32 rounded-full object-cover"
+      className={className || "w-32 h-32 rounded-full object-cover"}
     />
   );
 }
