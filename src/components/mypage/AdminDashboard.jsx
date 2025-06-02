@@ -24,19 +24,20 @@ export default function AdminDashboard() {
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem("accessToken");
+  const GT_PREFIX = import.meta.env.VITE_GT_SERVICE_PREFIX;
   const navigate = useNavigate();
 
   // 1) 데이터 로드
   const fetchPromo = async () => {
     const { data } = await axios.get(
-      `${API}/api/team6/admin/promotion/pending`,
+      `${API}${GT_PREFIX}/api/team6/admin/promotion/pending`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     setPromoReqs(data);
   };
   const fetchAllergy = async () => {
     const { data } = await axios.get(
-      `${API}/api/team6/admin/allergy-request/pending`,
+      `${API}${GT_PREFIX}/api/team6/admin/allergy-request/pending`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     setAllergyReqs(data);
@@ -49,7 +50,7 @@ export default function AdminDashboard() {
   // 2) 승인
   const handleApprove = async (type, id) => {
     await axios.post(
-      `${API}/api/team6/admin/${type}-request/approve/${id}`,
+      `${API}${GT_PREFIX}/api/team6/admin/${type}-request/approve/${id}`,
       null,
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -78,7 +79,7 @@ const confirmReject = async () => {
         ? `/api/team6/admin/promotion/reject/${id}`
         : `/api/team6/admin/allergy-request/reject/${id}`;
 
-    const url = `${API}${endpoint}`;
+    const url = `${API}${GT_PREFIX}${endpoint}`;
     console.log("거절 호출 URL:", url);
 
     await axios.post(

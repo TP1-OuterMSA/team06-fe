@@ -6,7 +6,8 @@ function WeeklyMealSection() {
   const [favoriteNames, setFavoriteNames] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
-
+  const GT_PREFIX = import.meta.env.VITE_GT_SERVICE_PREFIX;
+  
   const days = ["월", "화", "수", "목", "금"];
   const mealTypes = ["조식", "중식", "석식"];
 
@@ -17,7 +18,7 @@ function WeeklyMealSection() {
 
         const [mealsRes, favoritesRes] = await Promise.all([
           axios.get(`${API_BASE}/api/team6/meal/schedule/week`),
-          axios.get(`${API_BASE}/api/team6/user/meal/favorite`, {
+          axios.get(`${API_BASE}${GT_PREFIX}/api/team6/user/meal/favorite`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
