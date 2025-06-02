@@ -23,7 +23,7 @@ function TodayMealSection() {
           axios.get(`${API_BASE}/api/team6/meal/schedule/day`, {
             params: { day: today },
           }),
-          axios.get(`${API_BASE}/api/team6/user/meal/favorite`, {
+          axios.get(`${API_BASE}${import.meta.env.VITE_GT_SERVICE_PREFIX}/api/team6/user/meal/favorite`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);

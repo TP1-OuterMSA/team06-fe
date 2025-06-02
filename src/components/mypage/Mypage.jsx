@@ -14,6 +14,7 @@ function Mypage() {
   const { user } = useContext(UserContext);
   const [myInfo, setMyInfo] = useState(null);
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
+  const GT_PREFIX = import.meta.env.VITE_GT_SERVICE_PREFIX;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,7 +23,7 @@ function Mypage() {
         axios.defaults.headers.common.Authorization = `Bearer ${token}`;
 
         const { data } = await axios.get(
-          `${API_BASE}/api/team6/user/me`
+          `${API_BASE}${GT_PREFIX}/api/team6/user/me`
         );
         setMyInfo(data);
       } catch (err) {

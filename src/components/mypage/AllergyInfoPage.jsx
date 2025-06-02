@@ -9,7 +9,8 @@ import { UserContext } from "../../context/UserContext";
 function AllergyInfoPage() {
   const { user } = useContext(UserContext);
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
-
+  const GT_PREFIX = import.meta.env.VITE_GT_SERVICE_PREFIX;
+  
   // 전체 알레르기 목록 (서버에서 받아옴)
   const [allergies, setAllergies] = useState([]);
 
@@ -35,7 +36,7 @@ function AllergyInfoPage() {
   const fetchMyAllergies = async () => {
     try {
       const { data } = await axios.get(
-        `${API_BASE}/api/team6/user/userAllergy/me`
+        `${API_BASE}${GT_PREFIX}/api/team6/user/userAllergy/me`
       );
       setSelectedAllergies(data.allergies);
     } catch (err) {
@@ -62,7 +63,7 @@ function AllergyInfoPage() {
   const handleSave = async () => {
     try {
       await axios.put(
-        `${API_BASE}/api/team6/user/userAllergy/update`,
+        `${API_BASE}${GT_PREFIX}/api/team6/user/userAllergy/update`,
         {
           userId: user.id,
           allergies: selectedAllergies.map((a) => a.id),
@@ -85,7 +86,7 @@ function AllergyInfoPage() {
 
     try {
       await axios.post(
-        `${API_BASE}/api/team6/user/allergy-request`,
+        `${API_BASE}${GT_PREFIX}/api/team6/user/allergy-request`,
         { allergyName: name },
         // { headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` } }
       );

@@ -19,7 +19,8 @@ export default function AccountManagementPage() {
   const [promotionStatus, setPromotionStatus] = useState(null);
   const [loadingRequest, setLoadingRequest] = useState(false);
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
-
+  const GT_PREFIX = import.meta.env.VITE_GT_SERVICE_PREFIX;
+  
   // --- (1) 파일 선택 시 로컬 ObjectURL로 previewUrl 설정 ---
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -52,7 +53,7 @@ export default function AccountManagementPage() {
 
       // ① 닉네임/이메일 업데이트
       const { data: updatedUser } = await axios.patch(
-        `${API_BASE}/api/team6/user/update`,
+        `${API_BASE}${GT_PREFIX}/api/team6/user/update`,
         { nickname, email }
       );
 
@@ -62,7 +63,7 @@ export default function AccountManagementPage() {
         form.append("file", profileImageFile);
 
         await axios.post(
-          `${API_BASE}/api/team6/user/profile-image`,
+          `${API_BASE}${GT_PREFIX}/api/team6/user/profile-image`,
           form,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -89,9 +90,9 @@ export default function AccountManagementPage() {
   useEffect(() => {
     const fetchPromotionStatus = async () => {
       try {
-        const token = localStorage.getItem("jwtToken");
+        const token = localStorage.getItem("accessToken");
         const res = await axios.get(
-          `${API_BASE}/api/team6/user/promotion/status`,
+          `${API_BASE}${GT_PREFIX}/api/team6/user/promotion/status`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -111,10 +112,10 @@ export default function AccountManagementPage() {
     try {
       setLoadingRequest(true);
       await axios.post(
-        `${API_BASE}/api/team6/user/promotion/request`,
+        `${API_BASE}${GT_PREFIX}/api/team6/user/promotion/request`,
         null,
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` },
+          headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
         }
       );
       alert("승격 요청이 전송되었습니다.");
@@ -155,7 +156,7 @@ export default function AccountManagementPage() {
               ) : (
                 <ProfileImage
                   apiBaseUrl={API_BASE}
-                  token={localStorage.getItem("jwtToken")}
+                  token={localStorage.getItem("accessToken")}
                   refresh={refreshSidebar}
                   className="w-40 h-40 rounded-full object-cover mb-2 border border-gray-300"
                 />

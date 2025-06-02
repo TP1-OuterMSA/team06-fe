@@ -7,19 +7,20 @@ function FavoritesSection() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const navigate = useNavigate();
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
+  const GT_PREFIX = import.meta.env.VITE_GT_SERVICE_PREFIX;
 
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
         const token = localStorage.getItem("accessToken");
-        const userId = localStorage.getItem("userId");
+        //const userId = localStorage.getItem("userId");
 
         const res = await axios.get(
-          `${API_BASE}/api/team6/user/meal/favorite`,
+          `${API_BASE}${GT_PREFIX}/api/team6/user/meal/favorite`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
-              userId: userId,
+              //userId: userId,
             },
           }
         );

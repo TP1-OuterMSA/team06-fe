@@ -17,7 +17,7 @@ function WeeklyMealSection() {
 
         const [mealsRes, favoritesRes] = await Promise.all([
           axios.get(`${API_BASE}/api/team6/meal/schedule/week`),
-          axios.get(`${API_BASE}/api/team6/user/meal/favorite`, {
+          axios.get(`${API_BASE}${import.meta.env.VITE_GT_SERVICE_PREFIX}/api/team6/user/meal/favorite`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
