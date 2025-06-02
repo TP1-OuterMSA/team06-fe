@@ -9,6 +9,8 @@ export const UserContext = createContext();
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [initialized, setInitialized] = useState(false);
+  const GT_PREFIX = import.meta.env.VITE_GT_SERVICE_PREFIX;
+  
   let isRefreshing = false;
   let failedQueue = [];
 
@@ -20,29 +22,13 @@ export function UserProvider({ children }) {
     failedQueue = [];
   };
 
-  // const loadUser = useCallback(async () => {
-  //   try {
-  //     const { data } = await axios.get(
-  //       `${import.meta.env.VITE_API_BASE_URL}/api/team6/user/me`
-  //     );
-  //     setUser(data);
-  //   } catch (e) {
-  //     setUser(null);
-  //   } finally {
-  //     setInitialized(true);
-  //   }
-  // }, []);
-    
-  // useEffect(() => {
-  //   loadUser();
-  // }, [loadUser]);
-  // ─── (B) 앱 최초 마운트 시, localStorage에서 AT를 꺼내 헤더 설정 + /me 호출 ─────
+  // ─── 앱 최초 마운트 시, localStorage에서 AT를 꺼내 헤더 설정 + /me 호출 ─────
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     if (token) {
       axios.defaults.headers.common.Authorization = `Bearer ${token}`;
       axios
-        .get(`${import.meta.env.VITE_API_BASE_URL}/api/team6/user/me`)
+        .get(`${import.meta.env.VITE_API_BASE_URL}${GT_PREFIX}/api/team6/user/me`)
         .then(res => {
           setUser(res.data);
         })
@@ -131,7 +117,7 @@ export function UserProvider({ children }) {
       axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/api/team6/user/me`
+          `${import.meta.env.VITE_API_BASE_URL}${GT_PREFIX}/api/team6/user/me`
         );
         setUser(res.data);
       } catch {

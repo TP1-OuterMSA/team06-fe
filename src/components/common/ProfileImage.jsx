@@ -4,14 +4,15 @@ import defaultImage from "../../../public/default-profile.png";
 
 export default function ProfileImage({ apiBaseUrl, token, refresh, className }) {
   const [imgSrc, setImgSrc] = useState(null);
-
+  const GT_PREFIX = import.meta.env.VITE_GT_SERVICE_PREFIX;
+  
   useEffect(() => {
     let objectUrl;
 
     const fetchImage = async () => {
       try {
         const resp = await axios.get(
-          `${apiBaseUrl}/api/team6/user/profile-image`,
+          `${apiBaseUrl}${GT_PREFIX}/api/team6/user/profile-image`,
           {
             headers: { Authorization: `Bearer ${token}` },
             responseType: "blob",

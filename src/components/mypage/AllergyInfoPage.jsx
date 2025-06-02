@@ -23,7 +23,7 @@ function AllergyInfoPage() {
   const fetchAllergies = async () => {
     try {
       const { data } = await axios.get(
-        `${API_BASE}/api/team6/allergy/all`
+        `${API_BASE}${GT_PREFIX}/api/team6/allergy/all`
       );
       setAllergies(data);
     } catch (err) {
@@ -35,7 +35,7 @@ function AllergyInfoPage() {
   const fetchMyAllergies = async () => {
     try {
       const { data } = await axios.get(
-        `${API_BASE}/api/team6/user/userAllergy/me`
+        `${API_BASE}${GT_PREFIX}/api/team6/user/userAllergy/me`
       );
       setSelectedAllergies(data.allergies);
     } catch (err) {
@@ -62,7 +62,7 @@ function AllergyInfoPage() {
   const handleSave = async () => {
     try {
       await axios.put(
-        `${API_BASE}/api/team6/user/userAllergy/update`,
+        `${API_BASE}${GT_PREFIX}/api/team6/user/userAllergy/update`,
         {
           userId: user.id,
           allergies: selectedAllergies.map((a) => a.id),
@@ -85,7 +85,7 @@ function AllergyInfoPage() {
 
     try {
       await axios.post(
-        `${API_BASE}/api/team6/user/allergy-request`,
+        `${API_BASE}${GT_PREFIX}/api/team6/user/allergy-request`,
         { allergyName: name },
         // { headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` } }
       );

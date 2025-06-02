@@ -8,6 +8,7 @@ function FavoritesSectionEditable() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [loading, setLoading] = useState(true);
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
+  const GT_PREFIX = import.meta.env.VITE_GT_SERVICE_PREFIX;
 
   const fetchMealList = async () => {
     const res = await axios.get(`${API_BASE}/api/team6/meal/list`);
@@ -16,7 +17,7 @@ function FavoritesSectionEditable() {
 
   const fetchFavoriteIds = async () => {
     const token = localStorage.getItem("accessToken");
-    const res = await axios.get(`${API_BASE}/api/team6/user/meal/favorite`, {
+    const res = await axios.get(`${API_BASE}${GT_PREFIX}/api/team6/user/meal/favorite`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -91,7 +92,7 @@ function FavoritesSectionEditable() {
         return;
       }
       await axios.post(
-        `${API_BASE}/api/team6/user/meal/favorite`,
+        `${API_BASE}${GT_PREFIX}/api/team6/user/meal/favorite`,
         { meals: selectedMealIds },
         {
           headers: { Authorization: `Bearer ${token}` },
