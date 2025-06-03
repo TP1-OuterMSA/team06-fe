@@ -54,7 +54,7 @@ function FavoritesSection() {
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold">좋아하는 메뉴</h3>
         <button
-          onClick={() => navigate("/team6/mypage/favorites")}
+          onClick={() => navigate("/mypage/favorites")}
           className="text-sm text-blue-500 hover:underline"
         >
           + 추가하러 가기
