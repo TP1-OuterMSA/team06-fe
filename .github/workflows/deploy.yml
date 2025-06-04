@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - 'release'
+  workflow_dispatch:
 
 env:
   APP_ENV: development
@@ -17,6 +18,8 @@ env:
   VITE_GT_SERVICE_PREFIX: ${{ secrets.VITE_GT_SERVICE_PREFIX }}
   APP_NAME: team06-fe
   ECR_REPOSITORY: 809691348554.dkr.ecr.ap-northeast-2.amazonaws.com/team06-fe-repository
+  APP_NAME_2: init-page
+
 permissions:
   id-token: write
   contents: read
