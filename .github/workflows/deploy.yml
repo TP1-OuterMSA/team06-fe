@@ -18,7 +18,7 @@ env:
   VITE_GT_SERVICE_PREFIX: ${{ secrets.VITE_GT_SERVICE_PREFIX }}
   APP_NAME: team06-fe
   ECR_REPOSITORY: 809691348554.dkr.ecr.ap-northeast-2.amazonaws.com/team06-fe-repository
-  APP_NAME_2: init-page
+  APP_NAME_2: team06-fe
 
 permissions:
   id-token: write
@@ -113,16 +113,7 @@ jobs:
           git add .
           git diff-index --quiet HEAD || (git commit -m "Update ${{ secrets.APP_NAME }} image tag to sha-${{ env.SHORT_SHA }}" && git push)
 
-          # Infra 저장소 업데이트 단계-2
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image-2
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          DOCKER_TAG: ${{ env.APP_ENV }}
-        run: |
-          docker build --build-arg VITE_API_BASE_URL=${{ secrets.SERVER_HOST_2 }} -t ${{ env.ECR_REPOSITORY }}:sha-${{ env.SHORT_SHA }}-main .
-          docker push ${{ env.ECR_REPOSITORY }}:sha-${{ env.SHORT_SHA }}-main
-
+  # Infra 저장소 업데이트 단계-2
       - name: Checkout infrastructure repository2
         uses: actions/checkout@v3
         with:
@@ -143,13 +134,12 @@ jobs:
       - name: Update image tag in Helm chart
         run: |
           cd msa-infra-main/charts/services/${{ env.APP_NAME_2 }}
-          
           if [ -f values.yaml ]; then
             echo "values.yaml exists"
             cat values.yaml | head -10  # 파일 내용 일부 출력
           fi
           OLD_TAG=$(grep -oP 'tag: "\K[^"]+' values.yaml)
-          sed -i "s/tag: \".*\"/tag: \"sha-${{ env.SHORT_SHA }}-main\"/g" values.yaml
+          sed -i "s/tag: \".*\"/tag: \"sha-${{ env.SHORT_SHA }}\"/g" values.yaml
           echo "Updated values.yaml content:"
           cat values.yaml
           if [ "$OLD_TAG" != "sha-${{ env.SHORT_SHA }}" ]; then
@@ -157,8 +147,8 @@ jobs:
             echo "OLD_TAG=$OLD_TAG" >> $GITHUB_ENV
           else
             echo "TAG_CHANGED=false" >> $GITHUB_ENV
-          fi
-
+          fi          
+    
       - name: Commit and push changes to infrastructure repo
         run: |
           cd msa-infra-main
